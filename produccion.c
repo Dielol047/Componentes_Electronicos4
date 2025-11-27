@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdio.h>
 
-
 float ingresaFloat(const char* mensaje) {
     float valor;
     int valido = 0;
@@ -43,7 +42,7 @@ int ingresaEntero(const char* mensaje) {
     return valor;
 }
 
-void ingresarDatos(char nombres[][MAX_NAME_LENGTH], float* tiempos, float* recursos, float* cobre, int* demandas, int* cantidad_productos) {
+void ingresarDatos(char nombres[][MAX_NAME_LENGTH], float* tiempos, float* recursos, float* cobre, int* cantidad_productos) {
     if (*cantidad_productos >= MAX_PRODUCTS) {
         printf("Ya se ha alcanzado el maximo de %d productos.\n", MAX_PRODUCTS);
         return;
@@ -66,17 +65,15 @@ void ingresarDatos(char nombres[][MAX_NAME_LENGTH], float* tiempos, float* recur
     
     strcpy(nombres[*cantidad_productos], nombre_temp);
 
-   
     tiempos[*cantidad_productos]  = ingresaFloat("Tiempo de produccion (en horas)");
     recursos[*cantidad_productos] = ingresaFloat("Cantidad de Aluminio (mg)");
     cobre[*cantidad_productos]    = ingresaFloat("Cantidad en cobre (mg)");
-    demandas[*cantidad_productos] = ingresaEntero("Demanda del producto");
 
     printf("Producto agregado correctamente.\n");
     (*cantidad_productos)++;
 }
 
-void mostrarProductos(const char nombres[][MAX_NAME_LENGTH], const float* tiempos, const float* recursos, const float* cobre, const int* demandas, int cantidad_productos) {
+void mostrarProductos(const char nombres[][MAX_NAME_LENGTH], const float* tiempos, const float* recursos, const float* cobre, int cantidad_productos) {
     if (cantidad_productos == 0) {
         printf("No hay productos para mostrar.\n");
         return;
@@ -88,7 +85,6 @@ void mostrarProductos(const char nombres[][MAX_NAME_LENGTH], const float* tiempo
         printf("  Tiempo de Fabricacion: %.2fh\n", tiempos[i]);
         printf("  Cantidad de Aluminio: %.2f mg\n", recursos[i]);
         printf("  Cantidad de Cobre: %.2f mg\n", cobre[i]);
-        printf("  Demanda: %d unidades\n", demandas[i]);
     }
 }
 
@@ -101,7 +97,7 @@ int buscarProducto(const char nombres[][MAX_NAME_LENGTH], int cantidad_productos
     return -1; 
 }
 
-void editarProducto(char nombres[][MAX_NAME_LENGTH], float* tiempos, float* recursos, float* cobre, int* demandas, int cantidad_productos) {
+void editarProducto(char nombres[][MAX_NAME_LENGTH], float* tiempos, float* recursos, float* cobre, int cantidad_productos) {
     if (cantidad_productos == 0) {
         printf("No hay productos para editar.\n");
         return;
@@ -123,8 +119,7 @@ void editarProducto(char nombres[][MAX_NAME_LENGTH], float* tiempos, float* recu
             printf("2. Editar Tiempo de Fabricacion\n");
             printf("3. Editar Cantidad de Aluminio\n");
             printf("4. Editar Cantidad de Cobre\n");
-            printf("5. Editar Demanda\n");
-            printf("6. Salir de edicion\n");
+            printf("5. Salir de edicion\n");
             
             opcion = ingresaEntero("Seleccione una opcion");
 
@@ -161,24 +156,20 @@ void editarProducto(char nombres[][MAX_NAME_LENGTH], float* tiempos, float* recu
                     printf("Cobre actualizado.\n");
                     break;
                 case 5:
-                    demandas[indice] = ingresaEntero("Ingrese la nueva demanda");
-                    printf("Demanda actualizada.\n");
-                    break;
-                case 6:
                     printf("Finalizando edicion del producto.\n");
                     break;
                 default:
                     printf("Opcion invalida. Intente de nuevo.\n");
             }
 
-        } while (opcion != 6);
+        } while (opcion != 5);
 
     } else {
         printf("Producto no encontrado.\n");
     }
 }
 
-void eliminarProducto(char nombres[][MAX_NAME_LENGTH], float* tiempos, float* recursos, float* cobre, int* demandas, int* cantidad_productos) {
+void eliminarProducto(char nombres[][MAX_NAME_LENGTH], float* tiempos, float* recursos, float* cobre, int* cantidad_productos) {
     if (*cantidad_productos == 0) {
         printf("No hay productos para eliminar.\n");
         return;
@@ -196,7 +187,6 @@ void eliminarProducto(char nombres[][MAX_NAME_LENGTH], float* tiempos, float* re
             tiempos[i] = tiempos[i + 1];
             recursos[i] = recursos[i + 1];
             cobre[i] = cobre[i + 1];
-            demandas[i] = demandas[i + 1];
         }
         (*cantidad_productos)--;
         printf("Producto eliminado.\n");
@@ -205,72 +195,126 @@ void eliminarProducto(char nombres[][MAX_NAME_LENGTH], float* tiempos, float* re
     }
 }
 
-void calcularTotales(const char nombres[][MAX_NAME_LENGTH], const float* tiempos, const float* recursos, const float* cobre, const int* demandas, int cantidad_productos) {
-    if (cantidad_productos == 0) {
-        printf("No hay productos para calcular.\n");
-        return;
-    }
 
-    double tiempo_total = 0;
-    double recursos_totales = 0;
-    double cobre_total = 0;
+void ingresarRecursosDisponibles(float* tiempo_disp, float* alum_disp, float* cobre_disp) {
+    printf("\n--- Estado Actual de Recursos ---\n");
+    printf("  Tiempo disponible:   %.2f horas\n", *tiempo_disp);
+    printf("  Aluminio disponible: %.2f mg\n", *alum_disp);
+    printf("  Cobre disponible:    %.2f mg\n", *cobre_disp);
 
-    for (int i = 0; i < cantidad_productos; i++) {
-        tiempo_total += (double)tiempos[i] * demandas[i];
-        recursos_totales += (double)recursos[i] * demandas[i];
-        cobre_total += (double)cobre[i] * demandas[i];
-    }
-
-    printf("\n--- Totales de Produccion ---\n");
-    printf("Tiempo total de fabricacion requerido: %.2f horas.\n", tiempo_total);
-    printf("Cantidad total de aluminio necesaria: %.2f mg.\n", recursos_totales);
-    printf("Cantidad total de cobre necesaria: %.2f mg.\n", cobre_total);
+    printf("\n--- Actualizar Recursos ---\n");
+    *tiempo_disp = ingresaFloat("Ingrese la nueva cantidad de horas disponibles");
+    *alum_disp = ingresaFloat("Ingrese la nueva cantidad de aluminio total (mg)");
+    *cobre_disp = ingresaFloat("Ingrese la nueva cantidad de cobre total (mg)");
+    printf("Recursos actualizados exitosamente.\n");
 }
 
-void verificarViabilidad(const char nombres[][MAX_NAME_LENGTH], const float* tiempos, const float* recursos, const float* cobre, const int* demandas, int cantidad_productos) {
+
+void gestionarCarrito(const char nombres[][MAX_NAME_LENGTH], const float tiempos[], const float recursos[], const float cobre[], int cantidad_productos, float* tiempo_disp, float* alum_disp, float* cobre_disp) {
     if (cantidad_productos == 0) {
-        printf("No hay productos para verificar.\n");
+        printf("No hay productos definidos para comprar.\n");
         return;
     }
 
-    double tiempo_total_req = 0;
-    double recursos_totales_req = 0;
-    double cobre_total_req = 0;
+    
+    int cantidades[MAX_PRODUCTS] = {0};
+    int opcion_menu = 0;
+    int en_carrito = 1;
 
-    for (int i = 0; i < cantidad_productos; i++) {
-        tiempo_total_req += (double)tiempos[i] * demandas[i];
-        recursos_totales_req += (double)recursos[i] * demandas[i];
-        cobre_total_req += (double)cobre[i] * demandas[i];
-    }
-
-    float tiempo_disponible;
-    float recursos_disponibles;
-    float cobre_disponible;
-
-    tiempo_disponible = ingresaFloat("Ingrese el tiempo de produccion total disponible (en horas)");
-    recursos_disponibles = ingresaFloat("Ingrese la cantidad de aluminio total disponible");
-    cobre_disponible = ingresaFloat("Ingrese la cantidad de cobre total disponible");
-
-    printf("\n--- Analisis de Viabilidad ---\n");
-    printf("Tiempo total requerido: %.2f horas.\n", tiempo_total_req);
-    printf("Aluminio total requerido: %.2f mg.\n", recursos_totales_req);
-    printf("Cobre total requerido: %.2f mg.\n", cobre_total_req);
-    printf("Tiempo total disponible: %.2f horas.\n", tiempo_disponible);
-    printf("Aluminio total disponible: %.2f mg.\n", recursos_disponibles);
-    printf("Cobre total disponible: %.2f mg.\n", cobre_disponible);
-
-    if (tiempo_total_req <= tiempo_disponible && recursos_totales_req <= recursos_disponibles && cobre_total_req <= cobre_disponible) {
-        printf("\nConclusion: La fabrica PUEDE cumplir con la demanda.\n");
-    } else {
-        printf("\nConclusion: La fabrica NO PUEDE cumplir con la demanda.\n");
-        if (tiempo_total_req > tiempo_disponible) {
-            printf("  - Deficit de tiempo: %.2f horas.\n", tiempo_total_req - tiempo_disponible);
+    while (en_carrito) {
+        printf("\n======= MENU CARRITO DE COMPRA =======\n");
+        printf("Seleccione un producto para agregrar/modificar unidades:\n");
+        
+        
+        for (int i = 0; i < cantidad_productos; i++) {
+            printf("%d. %s (Actualmente en carrito: %d)\n", i + 1, nombres[i], cantidades[i]);
         }
-        if (recursos_totales_req > recursos_disponibles) {
-            printf("  - Deficit de aluminio: %.2f mg.\n", recursos_totales_req - recursos_disponibles);
-        }
-        if (cobre_total_req > cobre_disponible) {
-            printf("  - Deficit de cobre: %.2f mg.\n", cobre_total_req - cobre_disponible);
+        
+        
+        int opc_confirmar = cantidad_productos + 1;
+        int opc_salir = cantidad_productos + 2;
+
+        printf("%d. CONFIRMAR PROCESO DE PRODUCCION\n", opc_confirmar);
+        printf("%d. Volver al Menu Principal (Cancelar)\n", opc_salir);
+        printf("======================================\n");
+
+        opcion_menu = ingresaEntero("Seleccione una opcion");
+
+        
+        if (opcion_menu >= 1 && opcion_menu <= cantidad_productos) {
+            
+            int idx = opcion_menu - 1; 
+            
+            printf("\n--- Producto seleccionado: %s ---\n", nombres[idx]);
+            printf("Unidades actuales: %d\n", cantidades[idx]);
+            printf("Ingrese la nueva cantidad de unidades (0 para quitar, -1 para cancelar): ");
+            
+            int nueva_cantidad;
+            if (scanf("%d", &nueva_cantidad) == 1) {
+                while(getchar() != '\n'); 
+                
+                if (nueva_cantidad >= 0) {
+                    cantidades[idx] = nueva_cantidad;
+                    printf(">> Cantidad actualizada correctamente.\n");
+                } else {
+                    printf(">> Operacion cancelada. Volviendo a la lista de productos.\n");
+                }
+            } else {
+                while(getchar() != '\n');
+                printf(">> Error: Entrada no valida.\n");
+            }
+
+        } 
+        else if (opcion_menu == opc_confirmar) {
+            
+            double tiempo_req_total = 0;
+            double alum_req_total = 0;
+            double cobre_req_total = 0;
+            int hay_items = 0;
+
+            for (int i = 0; i < cantidad_productos; ++i) {
+                if (cantidades[i] > 0) {
+                    tiempo_req_total += (double)tiempos[i] * cantidades[i];
+                    alum_req_total += (double)recursos[i] * cantidades[i];
+                    cobre_req_total += (double)cobre[i] * cantidades[i];
+                    hay_items++;
+                }
+            }
+
+            if (hay_items == 0) {
+                printf("\n>> El carrito esta vacio. Seleccione productos primero.\n");
+            } else {
+                printf("\n--- Resumen Final ---\n");
+                printf("Tiempo requerido:   %.2f h\n", tiempo_req_total);
+                printf("Aluminio requerido: %.2f mg\n", alum_req_total);
+                printf("Cobre requerido:    %.2f mg\n", cobre_req_total);
+                printf("-------------------------\n");
+                printf("Recursos Disponibles -> T: %.2f h, Al: %.2f mg, Cu: %.2f mg\n", *tiempo_disp, *alum_disp, *cobre_disp);
+
+                if (tiempo_req_total > *tiempo_disp || alum_req_total > *alum_disp || cobre_req_total > *cobre_disp) {
+                    printf("\n[ERROR] RECURSOS INSUFICIENTES. Ajuste cantidades en el carrito.\n");
+                } else {
+                    int confirm = ingresaEntero("Confirma descontar estos recursos? (1: Si, 2: No)");
+                    if (confirm == 1) {
+                        *tiempo_disp -= (float)tiempo_req_total;
+                        *alum_disp -= (float)alum_req_total;
+                        *cobre_disp -= (float)cobre_req_total;
+                        printf("\n>> Produccion EXITOSA. Recursos descontados.\n");
+                        en_carrito = 0; 
+                    } else {
+                        printf("\n>> Confirmacion cancelada. Volviendo al carrito.\n");
+                    }
+                }
+            }
+
+        } 
+        else if (opcion_menu == opc_salir) {
+            
+            printf("\n>> Saliendo del carrito sin realizar cambios.\n");
+            en_carrito = 0; 
+        } 
+        else {
+            printf("\n>> Opcion invalida. Intente nuevamente.\n");
         }
     }
 }

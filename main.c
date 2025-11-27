@@ -11,7 +11,12 @@ int main() {
     float tiempos[MAX_PRODUCTS] = {0.0f};
     float recursos[MAX_PRODUCTS] = {0.0f};
     float cobre[MAX_PRODUCTS] = {0.0f};
-    int demandas[MAX_PRODUCTS] = {0};
+    
+    // Variables para stock/disponibilidad global
+    float tiempo_disponible = 0.0f;
+    float aluminio_disponible = 0.0f;
+    float cobre_disponible = 0.0f;
+
     int cantidad_productos = 0;
     int opcion;
 
@@ -21,8 +26,8 @@ int main() {
         printf("2. Mostrar productos\n");
         printf("3. Editar producto\n");
         printf("4. Eliminar producto\n");
-        printf("5. Calcular tiempo y recursos totales\n");
-        printf("6. Verificar viabilidad de produccion\n");
+        printf("5. Ingresar Recursos (Tiempo, Aluminio, Cobre)\n");
+        printf("6. Carrito de Produccion (Descontar recursos)\n");
         printf("7. Salir\n");
         printf("Seleccione una opcion: ");
         if(scanf("%d", &opcion) != 1) {
@@ -34,22 +39,22 @@ int main() {
 
         switch (opcion) {
             case 1:
-                ingresarDatos(nombres, tiempos, recursos, cobre, demandas, &cantidad_productos);
+                ingresarDatos(nombres, tiempos, recursos, cobre, &cantidad_productos);
                 break;
             case 2:
-                mostrarProductos(nombres, tiempos, recursos, cobre, demandas, cantidad_productos);
+                mostrarProductos(nombres, tiempos, recursos, cobre, cantidad_productos);
                 break;
             case 3:
-                editarProducto(nombres, tiempos, recursos, cobre, demandas, cantidad_productos);
+                editarProducto(nombres, tiempos, recursos, cobre, cantidad_productos);
                 break;
             case 4:
-                eliminarProducto(nombres, tiempos, recursos, cobre, demandas, &cantidad_productos);
+                eliminarProducto(nombres, tiempos, recursos, cobre, &cantidad_productos);
                 break;
             case 5:
-                calcularTotales(nombres, tiempos, recursos, cobre, demandas, cantidad_productos);
+                ingresarRecursosDisponibles(&tiempo_disponible, &aluminio_disponible, &cobre_disponible);
                 break;
             case 6:
-                verificarViabilidad(nombres, tiempos, recursos, cobre, demandas, cantidad_productos);
+                gestionarCarrito(nombres, tiempos, recursos, cobre, cantidad_productos, &tiempo_disponible, &aluminio_disponible, &cobre_disponible);
                 break;
             case 7:
                 printf("Saliendo del programa.\n");
